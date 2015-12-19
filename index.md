@@ -1,0 +1,118 @@
+---
+title       : Devoloping Data Products
+subtitle    : Class Project 
+author      : Ewerton Ciuffo
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight     # {highlight.js, prettify, highlight}
+hitheme     : solarized_ligth      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft,selfcontained}
+knit        : slidify::knit2slides
+
+--- 
+
+# John Hopkins Bloomberg School of Public Health
+Coursera Data Science Especialization<p>
+Devoloping Data Products<p>
+Class Project<p>
+
+Stock Quote Decomposition
+
+      This application will receive the following entries:
+      
+      1. Frequency - The lenght in months where the ciclycal pattern will be evaluated. 
+                     The default value for this value is 12 months(1 year).
+      2. Source    - The source of the data where the calculations will be based.
+                    the default value will be yahoo. other options will show as a dropdown.
+      3. The stock symbol - The stock sticker as defined on www.yahoo.com/definition
+        No validations will be performed on this value. If it does not match a valid
+        symmbol, an error message will be displayed. No special popup screen will be shown
+        in order to alert the user.
+      4. The Start date - the date from which the data will  be retrieved from the source.
+                          It is vital that the length of time between Start ands Ends Date
+                          allow for at least two cycles. By default this date is set to 
+                          1/1/1980 and users will be able to open an input window with a 
+                          calendar just by hovering over the field.
+      5. The End date - the closing date for the retrieved perion. 
+
+--- .class #id 
+
+# Output
+
+       The output for the requested information will be a sequence of four distinct
+       graphics. The first one will show the observed values as listed in the Opening
+       values for the stock market. 
+
+       The Second graphic will depict the general trend of the quote. This trend will show
+       the part of the value when the Ciclycal and Unexplained components are stripped from
+       the observed value.
+
+       The third and fourth graphics represent respectively, the ciclycal an the
+       Unexplained component of the observed value.
+
+       Please note that these graphics were drawn for educational purposes only and they
+       should not be considered as an advise. Any use of the data exposed here is "at your
+       own risk". 
+
+--- .class #id 
+
+# UI
+
+
+```r
+library(shiny)
+
+shinyUI(pageWithSidebar(
+  headerPanel('Stock Quote Decomposition'),
+  sidebarPanel(
+    sliderInput(inputId="freq", label="Choose a trend frequency desired",value = 12, min = 2, max = 36),
+    selectInput(inputId="mysrc",label="Choose a source:", choices = c("yahoo", "google"),selectize=FALSE),
+    textInput('symbol','Stock Symbol','MSFT'),
+    dateInput('ifrom', "Start Date", value = "1980-01-01", min = NULL, max = NULL, format = "yyyy-mm-dd", startview = "month", weekstart = 0, language = "en"),
+    dateInput('ito', "End Date", value = "2015-11-22", min = NULL, max = NULL, format = "yyyy-mm-dd", startview = "month", weekstart = 0, language = "en")),
+  mainPanel(
+      plotOutput('decompositionPlot')
+    )
+  ))
+```
+
+--- .class #id
+
+# Server
+
+
+```r
+shinyServer(function(input, output, session) {
+  output$decompositionPlot <- renderImage({
+    outfile <- tempfile(fileext='.png')
+    
+    from.dat <- as.Date(input$ifrom, format="%Y-%m-%d")
+    to.dat   <- as.Date(input$ito, format="%Y-%m-%d")
+    #mysrc.dat<-input.mysrc
+    mysrc.dat<-input$mysrc
+    myfreq   <-as.numeric(input$freq)
+    windowl<-as.numeric(input$to.dat - input$from.dat)
+     
+    mySymb <-getSymbols(Symbols=c(input$symbol), src=mysrc.dat, from=from.dat, to=to.dat, auto.assign=FALSE)
+    mySymbol <- to.monthly(mySymb)
+    myOpen   <- Op(mySymbol)
+    
+    pricesTimeSeries <- ts(myOpen, frequency = 12)
+    
+    # Generate the PNG
+    png(outfile, width=990, height=600)
+    plot(decompose(pricesTimeSeries,type = c("additive")))
+    dev.off()
+    
+    # Return a list containing the filename
+    list(src = outfile,
+         contentType = 'image/png',
+         width = 900,
+         height = 600,
+         alt = "Wait image loading")
+  }, deleteFile = TRUE)
+  })
+```
+---
+

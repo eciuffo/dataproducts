@@ -1,1 +1,209 @@
-Initialize index file.
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Devoloping Data Products</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Devoloping Data Products">
+  <meta name="author" content="Ewerton Ciuffo">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight/css/solarized_ligth.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Devoloping Data Products</h1>
+    <h2>Class Project</h2>
+    <p>Ewerton Ciuffo<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h1>John Hopkins Bloomberg School of Public Health</h1>
+  </hgroup>
+  <article data-timings="">
+    <p>Coursera Data Science Especialization<p>
+Devoloping Data Products<p>
+Class Project<p></p>
+
+<p>Stock Quote Decomposition</p>
+
+<pre><code>  This application will receive the following entries:
+
+  1. Frequency - The lenght in months where the ciclycal pattern will be evaluated. 
+                 The default value for this value is 12 months(1 year).
+  2. Source    - The source of the data where the calculations will be based.
+                the default value will be yahoo. other options will show as a dropdown.
+  3. The stock symbol - The stock sticker as defined on www.yahoo.com/definition
+    No validations will be performed on this value. If it does not match a valid
+    symmbol, an error message will be displayed. No special popup screen will be shown
+    in order to alert the user.
+  4. The Start date - the date from which the data will  be retrieved from the source.
+                      It is vital that the length of time between Start ands Ends Date
+                      allow for at least two cycles. By default this date is set to 
+                      1/1/1980 and users will be able to open an input window with a 
+                      calendar just by hovering over the field.
+  5. The End date - the closing date for the retrieved perion. 
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h1>Output</h1>
+  </hgroup>
+  <article data-timings="">
+    <pre><code>   The output for the requested information will be a sequence of four distinct
+   graphics. The first one will show the observed values as listed in the Opening
+   values for the stock market. 
+
+   The Second graphic will depict the general trend of the quote. This trend will show
+   the part of the value when the Ciclycal and Unexplained components are stripped from
+   the observed value.
+
+   The third and fourth graphics represent respectively, the ciclycal an the
+   Unexplained component of the observed value.
+
+   Please note that these graphics were drawn for educational purposes only and they
+   should not be considered as an advise. Any use of the data exposed here is &quot;at your
+   own risk&quot;. 
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h1>UI</h1>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">library(shiny)
+
+shinyUI(pageWithSidebar(
+  headerPanel(&#39;Stock Quote Decomposition&#39;),
+  sidebarPanel(
+    sliderInput(inputId=&quot;freq&quot;, label=&quot;Choose a trend frequency desired&quot;,value = 12, min = 2, max = 36),
+    selectInput(inputId=&quot;mysrc&quot;,label=&quot;Choose a source:&quot;, choices = c(&quot;yahoo&quot;, &quot;google&quot;),selectize=FALSE),
+    textInput(&#39;symbol&#39;,&#39;Stock Symbol&#39;,&#39;MSFT&#39;),
+    dateInput(&#39;ifrom&#39;, &quot;Start Date&quot;, value = &quot;1980-01-01&quot;, min = NULL, max = NULL, format = &quot;yyyy-mm-dd&quot;, startview = &quot;month&quot;, weekstart = 0, language = &quot;en&quot;),
+    dateInput(&#39;ito&#39;, &quot;End Date&quot;, value = &quot;2015-11-22&quot;, min = NULL, max = NULL, format = &quot;yyyy-mm-dd&quot;, startview = &quot;month&quot;, weekstart = 0, language = &quot;en&quot;)),
+  mainPanel(
+      plotOutput(&#39;decompositionPlot&#39;)
+    )
+  ))
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h1>Server</h1>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">shinyServer(function(input, output, session) {
+  output$decompositionPlot &lt;- renderImage({
+    outfile &lt;- tempfile(fileext=&#39;.png&#39;)
+
+    from.dat &lt;- as.Date(input$ifrom, format=&quot;%Y-%m-%d&quot;)
+    to.dat   &lt;- as.Date(input$ito, format=&quot;%Y-%m-%d&quot;)
+    #mysrc.dat&lt;-input.mysrc
+    mysrc.dat&lt;-input$mysrc
+    myfreq   &lt;-as.numeric(input$freq)
+    windowl&lt;-as.numeric(input$to.dat - input$from.dat)
+
+    mySymb &lt;-getSymbols(Symbols=c(input$symbol), src=mysrc.dat, from=from.dat, to=to.dat, auto.assign=FALSE)
+    mySymbol &lt;- to.monthly(mySymb)
+    myOpen   &lt;- Op(mySymbol)
+
+    pricesTimeSeries &lt;- ts(myOpen, frequency = 12)
+
+    # Generate the PNG
+    png(outfile, width=990, height=600)
+    plot(decompose(pricesTimeSeries,type = c(&quot;additive&quot;)))
+    dev.off()
+
+    # Return a list containing the filename
+    list(src = outfile,
+         contentType = &#39;image/png&#39;,
+         width = 900,
+         height = 600,
+         alt = &quot;Wait image loading&quot;)
+  }, deleteFile = TRUE)
+  })
+</code></pre>
+
+<hr>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='John Hopkins Bloomberg School of Public Health'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Output'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='UI'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Server'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+   
+  </html>
