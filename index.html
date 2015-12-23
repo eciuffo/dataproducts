@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
     media="only screen and (max-device-width: 480px)" >
   <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
-  <link rel="stylesheet" href="libraries/highlighters/highlight/css/solarized_ligth.css" />
+  <link rel="stylesheet" href="libraries/highlighters/highlight,js/css/tomorrow.css" />
   <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
 
   
@@ -43,32 +43,46 @@
     <!-- SLIDES -->
     <slide class="" id="slide-1" style="background:;">
   <hgroup>
-    <h1>John Hopkins Bloomberg School of Public Health</h1>
+    <h2>Stock Quote Decomposition</h2>
   </hgroup>
   <article data-timings="">
-    <p>Coursera Data Science Especialization<p>
-Devoloping Data Products<p>
-Class Project<p></p>
+    <div class="container">
+<h5>This application was developed as a Data Products Class project as part of
+the <b>Data science Specialization</b> of the <b>Coursera/John Hopkins University</b> program.
+</h5><p>
+<h5>The product focus on the use of the Shiny R package and implements the Quantmod R package, used here to decompose the three distinct components of a stock quote based on data downloaded from the source (eg. yahoo | google), selected from a drop box and covering a period of time selected by the Begin and End date chosen by the display calendars shown in the parameters session of the screen.
+</h5><p>
+<h5>The cyclical component is based on a frequency measured in months and also selected from the parameter session of the screen. The default value 12 stands for the usual one calendar year. The time window covered must allow for at least two consecutive cycles, otherwise the application will throw an error message.
+</h5><p>   
+<h5>The stock simbol specified in the parameter session of the screen must be a valid stock quote as listed on "http://www.yahoo.com/lookup". No special validation pop up screen will show up and only an basic error message will appear as a result.
+</h5></div>
 
-<p>Stock Quote Decomposition</p>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
 
-<pre><code>  This application will receive the following entries:
-
-  1. Frequency - The lenght in months where the ciclycal pattern will be evaluated. 
-                 The default value for this value is 12 months(1 year).
-  2. Source    - The source of the data where the calculations will be based.
-                the default value will be yahoo. other options will show as a dropdown.
-  3. The stock symbol - The stock sticker as defined on www.yahoo.com/definition
-    No validations will be performed on this value. If it does not match a valid
-    symmbol, an error message will be displayed. No special popup screen will be shown
-    in order to alert the user.
-  4. The Start date - the date from which the data will  be retrieved from the source.
-                      It is vital that the length of time between Start ands Ends Date
-                      allow for at least two cycles. By default this date is set to 
-                      1/1/1980 and users will be able to open an input window with a 
-                      calendar just by hovering over the field.
-  5. The End date - the closing date for the retrieved perion. 
-</code></pre>
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>The Input</h2>
+  </hgroup>
+  <article data-timings="">
+    <div class="container">
+<h5>This application will receive the following entries:</h5><p>
+<h5>  1. Frequency - The lenght in months where the ciclycal pattern will be evaluated. 
+                     The default value for this value is 12 months(1 year).</h5><p>
+<h5>  2. Source    - The source of the data where the calculations will be based.
+                    the default value will be yahoo. other options will show as a dropdown.</h5><p>
+<h5>  3. The stock symbol - The stock sticker as defined on www.yahoo.com/definition
+        No validations will be performed on this value. If it does not match a valid
+        symmbol, an error message will be displayed. No special popup screen will be shown
+        in order to alert the user.</h5><p>
+<h5>  4. The Start date - the date from which the data will  be retrieved from the source.
+                          It is vital that the length of time between Start ands Ends Date
+                          allow for at least two cycles. By default this date is set to 
+                          1/1/1980 and users will be able to open an input window with a 
+                          calendar just by hovering over the field.</h5><p>
+<h5>   5. The End date - the closing date for the retrieved perion. </h5>
+</div>
 
   </article>
   <!-- Presenter Notes -->
@@ -76,7 +90,7 @@ Class Project<p></p>
 
 <slide class="class" id="id" style="background:;">
   <hgroup>
-    <h1>Output</h1>
+    <h2>The Output</h2>
   </hgroup>
   <article data-timings="">
     <pre><code>   The output for the requested information will be a sequence of four distinct
@@ -101,7 +115,7 @@ Class Project<p></p>
 
 <slide class="class" id="id" style="background:;">
   <hgroup>
-    <h1>UI</h1>
+    <h2>The UI component of Shiny</h2>
   </hgroup>
   <article data-timings="">
     <pre><code class="r">library(shiny)
@@ -126,10 +140,30 @@ shinyUI(pageWithSidebar(
 
 <slide class="class" id="id" style="background:;">
   <hgroup>
-    <h1>Server</h1>
+    <h2>The Server component of Shiny</h2>
   </hgroup>
   <article data-timings="">
-    <pre><code class="r">shinyServer(function(input, output, session) {
+    <pre><code class="r">library(shiny)
+library(xts)
+</code></pre>
+
+<pre><code>## Loading required package: zoo
+## 
+## Attaching package: &#39;zoo&#39;
+## 
+## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric
+</code></pre>
+
+<pre><code class="r">library(quantmod)
+</code></pre>
+
+<pre><code>## Loading required package: TTR
+## Version 0.4-0 included new data defaults. See ?getSymbols.
+</code></pre>
+
+<pre><code class="r">shinyServer(function(input, output, session) {
   output$decompositionPlot &lt;- renderImage({
     outfile &lt;- tempfile(fileext=&#39;.png&#39;)
 
@@ -161,8 +195,13 @@ shinyUI(pageWithSidebar(
   })
 </code></pre>
 
-<hr>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
 
+<slide class="" id="slide-6" style="background:;">
+  <article data-timings="">
+    
   </article>
   <!-- Presenter Notes -->
 </slide>
@@ -173,26 +212,38 @@ shinyUI(pageWithSidebar(
     <ul>
       <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=1 title='John Hopkins Bloomberg School of Public Health'>
+        data-slide=1 title='Stock Quote Decomposition'>
          1
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='Output'>
+        data-slide=2 title='The Input'>
          2
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=3 title='UI'>
+        data-slide=3 title='The Output'>
          3
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=4 title='Server'>
+        data-slide=4 title='The UI component of Shiny'>
          4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='The Server component of Shiny'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='NA'>
+         6
       </a>
     </li>
   </ul>

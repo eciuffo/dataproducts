@@ -4,41 +4,50 @@ subtitle    : Class Project
 author      : Ewerton Ciuffo
 job         : 
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
-highlighter : highlight     # {highlight.js, prettify, highlight}
-hitheme     : solarized_ligth      # 
+highlighter : highlight,js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
 widgets     : []            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft,selfcontained}
 knit        : slidify::knit2slides
-
 --- 
 
-# John Hopkins Bloomberg School of Public Health
-Coursera Data Science Especialization<p>
-Devoloping Data Products<p>
-Class Project<p>
+## Stock Quote Decomposition
 
-Stock Quote Decomposition
+<div class="container">
+<h5>This application was developed as a Data Products Class project as part of
+the <b>Data science Specialization</b> of the <b>Coursera/John Hopkins University</b> program.
+</h5><p>
+<h5>The product focus on the use of the Shiny R package and implements the Quantmod R package, used here to decompose the three distinct components of a stock quote based on data downloaded from the source (eg. yahoo | google), selected from a drop box and covering a period of time selected by the Begin and End date chosen by the display calendars shown in the parameters session of the screen.
+</h5><p>
+<h5>The cyclical component is based on a frequency measured in months and also selected from the parameter session of the screen. The default value 12 stands for the usual one calendar year. The time window covered must allow for at least two consecutive cycles, otherwise the application will throw an error message.
+</h5><p>   
+<h5>The stock simbol specified in the parameter session of the screen must be a valid stock quote as listed on "http://www.yahoo.com/lookup". No special validation pop up screen will show up and only an basic error message will appear as a result.
+</h5></div>
 
-      This application will receive the following entries:
-      
-      1. Frequency - The lenght in months where the ciclycal pattern will be evaluated. 
-                     The default value for this value is 12 months(1 year).
-      2. Source    - The source of the data where the calculations will be based.
-                    the default value will be yahoo. other options will show as a dropdown.
-      3. The stock symbol - The stock sticker as defined on www.yahoo.com/definition
+---
+
+## The Input 
+<div class="container">
+<h5>This application will receive the following entries:</h5><p>
+<h5>  1. Frequency - The lenght in months where the ciclycal pattern will be evaluated. 
+                     The default value for this value is 12 months(1 year).</h5><p>
+<h5>  2. Source    - The source of the data where the calculations will be based.
+                    the default value will be yahoo. other options will show as a dropdown.</h5><p>
+<h5>  3. The stock symbol - The stock sticker as defined on www.yahoo.com/definition
         No validations will be performed on this value. If it does not match a valid
         symmbol, an error message will be displayed. No special popup screen will be shown
-        in order to alert the user.
-      4. The Start date - the date from which the data will  be retrieved from the source.
+        in order to alert the user.</h5><p>
+<h5>  4. The Start date - the date from which the data will  be retrieved from the source.
                           It is vital that the length of time between Start ands Ends Date
                           allow for at least two cycles. By default this date is set to 
                           1/1/1980 and users will be able to open an input window with a 
-                          calendar just by hovering over the field.
-      5. The End date - the closing date for the retrieved perion. 
+                          calendar just by hovering over the field.</h5><p>
+<h5>   5. The End date - the closing date for the retrieved perion. </h5>
+</div>
 
 --- .class #id 
 
-# Output
+## The Output
 
        The output for the requested information will be a sequence of four distinct
        graphics. The first one will show the observed values as listed in the Opening
@@ -57,7 +66,7 @@ Stock Quote Decomposition
 
 --- .class #id 
 
-# UI
+## The UI component of Shiny
 
 
 ```r
@@ -79,8 +88,32 @@ shinyUI(pageWithSidebar(
 
 --- .class #id
 
-# Server
+## The Server component of Shiny
 
+
+```r
+library(shiny)
+library(xts)
+```
+
+```
+## Loading required package: zoo
+## 
+## Attaching package: 'zoo'
+## 
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+```
+
+```r
+library(quantmod)
+```
+
+```
+## Loading required package: TTR
+## Version 0.4-0 included new data defaults. See ?getSymbols.
+```
 
 ```r
 shinyServer(function(input, output, session) {
@@ -114,5 +147,5 @@ shinyServer(function(input, output, session) {
   }, deleteFile = TRUE)
   })
 ```
----
 
+---
